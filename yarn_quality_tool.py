@@ -1,0 +1,81 @@
+import csv
+
+
+# Function to input yarn quality data
+def input_yarn_data():
+    sample_id = input("Enter Sample ID: ")
+    yarn_count = float(input("Enter Yarn Count (Ne): "))
+    twist_per_inch = float(input("Enter Twist per Inch (TPI): "))
+    tensile_strength = float(input("Enter Tensile Strength (N): "))
+
+    data = [sample_id, yarn_count, twist_per_inch, tensile_strength]
+
+    with open('yarn_quality_data.csv', 'a', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(data)
+
+    print("Data saved successfully!")
+
+
+# Function to assess yarn quality
+def assess_quality():
+    with open('yarn_quality_data.csv', 'r') as file:
+        reader = csv.reader(file)
+        rows = list(reader)
+
+        if len(rows) < 2:
+            print("No data available to assess.")
+            return
+
+        last_row = rows[-1]
+        yarn_count = float(last_row[1])
+        twist_per_inch = float(last_row[2])
+        tensile_strength = float(last_row[3])
+
+        issues = []
+        if abs(yarn_count - 30) > 2:
+            issues.append("Yarn Count deviates from standard.")
+        if abs(twist_per_inch - 20) > 2:
+            issues.append("Twist per Inch deviates from standard.")
+        if tensile_strength < 25:
+            issues.append("Tensile Strength below acceptable range.")
+
+        if issues:
+            print("Quality Issues Found:")
+            for issue in issues:
+                print(f" - {issue}")
+        else:
+            print("Sample passed quality control.")
+
+
+# Main function to run the tool
+def main():
+    while True:
+        print("\n--- Yarn Quality Analysis Tool ---")
+        print("1. Input Yarn Data")
+        print("2. Assess Quality")
+        print("3. Exit")
+
+        choice = input("Enter your choice: ")
+
+        if choice == '1':
+            input_yarn_data()
+        elif choice == '2':
+            assess_quality()
+        elif choice == '3':
+            break
+        else:
+            print("Invalid choice! Please try again.")
+
+
+# Initialize the CSV file with headers if not already created
+try:
+    with open('yarn_quality_data.csv', 'x', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(["Sample ID", "Yarn Count (Ne)", "Twist per Inch (TPI)", "Tensile Strength (N)"])
+except FileExistsError:
+    pass  # File already exists, no need to create
+
+# Run the tool
+if __name__ == "__main__":
+    main()
